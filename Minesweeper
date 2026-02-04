@@ -2,11 +2,30 @@
 
 # CLI GUI Function
 print_board() {
-  for y in $(seq 0 9); do
-    for x in $(seq 0 9); do
-      echo "0"
+  echo ""
+  echo "    Guesses made: "${!GUSTRK[@]}"   Flags Placed: "${!GUSTRK[@]}
+  echo ""
+  echo "          1 2 3 4 5 6 7 8 9"
+  echo "         %%%%%%%%%%%%%%%%%%%"
+  for y in $(seq 0 10); do
+    ROWARR=()
+    for x in $(seq 0 8); do
+      case $CELLTYPE in
+      SAFE)
+        ROWARR[x + 3]="O"
+        ;;
+      FLAG)
+        ROWARR[x + 3]="F"
+        ;;
+      UNGES)
+        ROWARR[x + 3]="X"
+        ;;
+      esac
     done
+    echo "       "${ALPH[y]}" |"${ROWARR[*]}"|"
   done
+  echo "         %%%%%%%%%%%%%%%%%%%"
+  echo ""
 }
 
 # Setup Board and variables
@@ -16,6 +35,9 @@ BOMARR=(00)
 CLRSPC=0
 GUSTRK=()
 GUSNUM=0
+CELLTYPE="UNGES"
+FLAGARR=()
+ALPH=("A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K")
 
 #Generate Bomb Locations
 while test $BOMNUM -lt $TARGETBOM; do
@@ -50,7 +72,30 @@ done
 
 while test $CLRSPC -lt 90; do
   print_board
+  echo "      What is your next guess? :"
   read GUESSLOC
+  ERRORCKX=0
+  ERRORCKY=0
+
+  if [[ ${GUESSLOC:0} =~ ^[+-]?[0-9]+$ ]]; then
+    :
+  else
+    echo "!!X guess is not a number!!"
+    ERRORCKX=1
+  fi
+
+  if test $ERRORCKX -eq 0; then
+    if test ${GUESSLOC:0} -lt 1; then
+      echo "!!0 is not on the board!!"
+      ERRORCK=1
+    fi
+  fi
+
+  while test $ERRORCK -eq 1; do
+    :
+  done
+
+  #clear
 done
 
 # TEST OUTPUT
