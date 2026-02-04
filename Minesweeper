@@ -1,0 +1,60 @@
+#!/bin/bash
+
+# CLI GUI Function
+print_board() {
+  for y in $(seq 0 9); do
+    for x in $(seq 0 9); do
+      echo "0"
+    done
+  done
+}
+
+# Setup Board and variables
+TARGETBOM=10
+BOMNUM=0
+BOMARR=(00)
+CLRSPC=0
+GUSTRK=()
+GUSNUM=0
+
+#Generate Bomb Locations
+while test $BOMNUM -lt $TARGETBOM; do
+
+  #Run while less than target number of bombs
+  GOODCHECK=1                            # Reset Checker
+  BOMLOC=$((RANDOM % (100 - 1 + 1) + 1)) # Generate new random bomb position
+
+  # Test if single digit number for formatting
+  if test $BOMLOC -lt 10; then # If bomb location number is < 10
+    BOMLOC="0"$BOMLOC          # add 0 to front of single digit number
+  fi
+
+  # Test if bomb is in repeat location
+  for i in $( # for every bomb already placed
+    seq 0 $((BOMNUM - 1))
+  ); do
+    if test $BOMLOC -eq ${BOMARR[i]}; then # if the new bomb is loacted in repeat spot
+      GOODCHECK=0                          # Trip checker variable
+    else                                   # if bomb location unique
+      :                                    # continue through loop
+    fi
+  done
+
+  # Test if checker has been tripped
+  if test $GOODCHECK -eq 1; then # If checker is still good
+    BOMARR[$BOMNUM]=$BOMLOC      # Add new location to array
+    BOMNUM=$((BOMNUM + 1))       # Add to bomb count
+  fi
+
+done
+
+while test $CLRSPC -lt 90; do
+  print_board
+  read GUESSLOC
+done
+
+# TEST OUTPUT
+echo $BOMNUM
+echo $BOMLOC
+echo ${BOMARR[*]}
+print_board
