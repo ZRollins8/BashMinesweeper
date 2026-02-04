@@ -3,7 +3,7 @@
 # CLI GUI Function
 print_board() {
   echo ""
-  echo "    Guesses made: "${!GUSTRK[@]}"   Flags Placed: "${!GUSTRK[@]}
+  echo "    Spaces Cleared: "$CLRSPC"   Flags Placed: "${!FLGARR[@]}
   echo ""
   echo "          1 2 3 4 5 6 7 8 9"
   echo "         %%%%%%%%%%%%%%%%%%%"
@@ -12,13 +12,13 @@ print_board() {
     for x in $(seq 0 8); do
       case $CELLTYPE in
       SAFE)
-        ROWARR[x + 3]="O"
+        ROWARR[x]="O"
         ;;
       FLAG)
-        ROWARR[x + 3]="F"
+        ROWARR[x]="F"
         ;;
       UNGES)
-        ROWARR[x + 3]="X"
+        ROWARR[x]="X"
         ;;
       esac
     done
@@ -74,22 +74,48 @@ while test $CLRSPC -lt 90; do
   print_board
   echo "      What is your next guess? :"
   read GUESSLOC
+  GUESSX=${GUESSLOC:0:1}
+  GUESSY=${GUESSLOC:1:2}
   ERRORCKX=0
   ERRORCKY=0
+  ERRORCK=0
 
-  if [[ ${GUESSLOC:0} =~ ^[+-]?[0-9]+$ ]]; then
+
+  if [[ $GUESSX =~ ^[+-]?[0-9]+$ ]]; then
     :
   else
-    echo "!!X guess is not a number!!"
+    echo "!!X guess is not a number!!" 
     ERRORCKX=1
   fi
 
   if test $ERRORCKX -eq 0; then
-    if test ${GUESSLOC:0} -lt 1; then
+    if test $GUESSX -lt 1; then
       echo "!!0 is not on the board!!"
-      ERRORCK=1
+      ERRORCKX=1
     fi
   fi
+
+
+  if [[ $GUESSY =~ ^[+-]?[0-9]+$ ]]; then
+    echo "!!Y guess is not a letter"
+    ERRORCKY=1
+  else
+    :
+  fi
+
+  if test $ERRORCKY -eq 0; then
+    ERROCKY=1
+    for t in $(seq 0 10); do
+    	if  [[ $GUESSY == ${ALPH[t]} ]]; then
+      		ERRORCKY=0
+    	fi
+    done
+    if test $ERRORCKY -eq 1;then
+	echo "!!Y guess is not in range!!"
+    fi
+  fi
+
+
 
   while test $ERRORCK -eq 1; do
     :
@@ -99,7 +125,7 @@ while test $CLRSPC -lt 90; do
 done
 
 # TEST OUTPUT
-echo $BOMNUM
-echo $BOMLOC
-echo ${BOMARR[*]}
-print_board
+#echo $BOMNUM
+#echo $BOMLOC
+#echo ${BOMARR[*]}
+#print_board
