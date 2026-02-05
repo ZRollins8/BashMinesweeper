@@ -1,5 +1,12 @@
 #!/bin/bash
 
+#BASH MINESWEEPER
+#by: Zane Rollins
+#date: 2/4/2026
+#Minesweeper that can be played in the terminal via the bash shell
+
+clear
+
 # CLI GUI Function
 print_board() {
   echo ""
@@ -28,6 +35,15 @@ print_board() {
   echo ""
 }
 
+death_screen() {
+echo "died"
+DEAD=1
+}
+
+convert_coords() {
+
+}
+
 # Setup Board and variables
 TARGETBOM=10
 BOMNUM=0
@@ -38,6 +54,8 @@ GUSNUM=0
 CELLTYPE="UNGES"
 FLAGARR=()
 ALPH=("A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K")
+ERR="     What is your guess? :"
+DEAD=0
 
 #Generate Bomb Locations
 while test $BOMNUM -lt $TARGETBOM; do
@@ -70,9 +88,9 @@ while test $BOMNUM -lt $TARGETBOM; do
 
 done
 
-while test $CLRSPC -lt 90; do
+while test $CLRSPC -lt 90 && test $DEAD -eq 0; do
   print_board
-  echo "      What is your next guess? :"
+  echo "    "$ERR 
   read GUESSLOC
   GUESSX=${GUESSLOC:0:1}
   GUESSY=${GUESSLOC:1:2}
@@ -80,48 +98,65 @@ while test $CLRSPC -lt 90; do
   ERRORCKY=0
   ERRORCK=0
 
-
   if [[ $GUESSX =~ ^[+-]?[0-9]+$ ]]; then
     :
   else
-    echo "!!X guess is not a number!!" 
+    ERR="!!X guess is not a number!!" 
     ERRORCKX=1
   fi
 
   if test $ERRORCKX -eq 0; then
     if test $GUESSX -lt 1; then
-      echo "!!0 is not on the board!!"
+      ERR="!!0 is not on the board!!"
       ERRORCKX=1
     fi
   fi
 
 
   if [[ $GUESSY =~ ^[+-]?[0-9]+$ ]]; then
-    echo "!!Y guess is not a letter"
+    ERR="!!Y guess is not a letter"
     ERRORCKY=1
   else
     :
   fi
 
-  if test $ERRORCKY -eq 0; then
-    ERROCKY=1
+  if test $ERRORCKY -eq 0; then	
+    ERRORCKY=1
     for t in $(seq 0 10); do
-    	if  [[ $GUESSY == ${ALPH[t]} ]]; then
-      		ERRORCKY=0
+    	if [[ "$GUESSY" == "${ALPH[t]}" ]] ; then	
+		ERRORCKY=0
     	fi
-    done
-    if test $ERRORCKY -eq 1;then
-	echo "!!Y guess is not in range!!"
+    done 
+    if test $ERRORCKY -eq 1; then
+	ERR="!!Y guess is not in range!!"
     fi
   fi
 
+  for n in $(seq 0 $((CLRSPC-1))); do
+   if [[ "$GUESSLOC" == "${GUSTRK[n]}" ]] ; then	
+      ERRORCK=1
+      ERR="!!Space has already been cleared!!" 
+   fi
+ done
 
 
-  while test $ERRORCK -eq 1; do
-    :
-  done
+  if test $ERRORCKY -eq 1 || test $ERRORCKX -eq 1 || test $ERRORCK -eq 1; then
+	  echo "bad"
+	  #:
+  else
 
-  #clear
+        for m in $(seq 0 $((TARGETBOM-1))); do
+		if [[ "$GUESSLOC" == "${BOMARR[m]}" ]]; then
+		   death_screen
+		else
+		   ERR="     Which space to clear? :"
+		   GUSTRK[$CLRSPC]=$GUESSLOC
+		   CLRSPC=$((CLRSPC+1))
+		fi
+	done
+  fi
+
+  clear
 done
 
 # TEST OUTPUT
