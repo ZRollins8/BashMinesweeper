@@ -36,17 +36,20 @@ print_board() {
 }
 
 death_screen() {
-  echo "          YOU FAILED :("
-  echo "       %%%%%%%%%%%%%%%%%%%%"
-  echo "      %%%%%%%%%%%%%%%%%%%%%%"
-  echo "      %%%%   %%%%%%%%%  %%%%"
-  echo "      %%%%   %%%%%%%%%  %%%%"
-  echo "      %%%%%%%%%%% %%%%%%%%%%"
-  echo "        %%%%%%%%   %%%%%%%"
-  echo "          %%%%%%%%%%%%%%"
-  echo "          %%%%%%%%%%%%%%"
-  echo "          %%% %% %% %%%"
-  echo "          %%% %% %% %%%"
+  echo "           YOU FAILED :("
+  echo ""
+  echo "          %%%%%%%%%%%%%%%       "
+  echo "       %%%%%%%%%%%%%%%%%%%%%    "
+  echo "      %%%%%%%%%%%%%%%%%%%%%%%   "
+  echo "      %%%%   %%%%%%%%%  %%%%%   "
+  echo "      %%%%   %%%%%%%%%  %%%%%   "
+  echo "      %%%%%%%%%%% %%%%%%%%%%%   "
+  echo "        %%%%%%%%   %%%%%%%%     "
+  echo "          %%%%%%%%%%%%%%%        "
+  echo "          %%%%%%%%%%%%%%%        "
+  echo "           %%% %% %% %%%        "
+  echo "           %%% %% %% %%%        "
+  echo ""
   echo "    Spaces Cleared: "$CLRSPC"   Flags Placed: "${!FLGARR[@]}
   DEAD=1
 }
@@ -61,9 +64,10 @@ convert_coords() {
     fi
   done
 
-  FIRSTOUT=$((9 * YINDEX))
-  SECONDOUT=$((FIRSTOUT + SECONDIN))
-  GUESSLOC=$SECONDOUT
+  ROWADD=$((9 * YINDEX))
+  COLMADD=$((ROWADD + FIRSTIN))
+  GUESSLOC=$((COLMADD))
+  #echo $GUESSLOC
 }
 
 # Setup Board and variables
@@ -112,8 +116,8 @@ done
 
 while test $CLRSPC -lt 90 && test $DEAD -eq 0; do
   print_board
-  echo "    "$ERR
-  echo ${BOMARR[@]}
+  echo "       "$ERR
+  #echo ${BOMARR[@]}
   read GUESSLOC
 
   GUESSX=${GUESSLOC:0:1}
@@ -172,13 +176,14 @@ while test $CLRSPC -lt 90 && test $DEAD -eq 0; do
         death_screen
       else
         ERR="     Which space to clear? :"
-        GUSTRK[$CLRSPC]=$GUESSLOC
-        CLRSPC=$((CLRSPC + 1))
+
       fi
     done
+    GUSTRK[$CLRSPC]=$GUESSLOC
+    CLRSPC=$((CLRSPC + 1))
   fi
 
-  #clear
+  clear
 done
 
 # TEST OUTPUT
