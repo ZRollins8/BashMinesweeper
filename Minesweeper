@@ -36,12 +36,34 @@ print_board() {
 }
 
 death_screen() {
-echo "died"
-DEAD=1
+  echo "          YOU FAILED :("
+  echo "       %%%%%%%%%%%%%%%%%%%%"
+  echo "      %%%%%%%%%%%%%%%%%%%%%%"
+  echo "      %%%%   %%%%%%%%%  %%%%"
+  echo "      %%%%   %%%%%%%%%  %%%%"
+  echo "      %%%%%%%%%%% %%%%%%%%%%"
+  echo "        %%%%%%%%   %%%%%%%"
+  echo "          %%%%%%%%%%%%%%"
+  echo "          %%%%%%%%%%%%%%"
+  echo "          %%% %% %% %%%"
+  echo "          %%% %% %% %%%"
+  echo "    Spaces Cleared: "$CLRSPC"   Flags Placed: "${!FLGARR[@]}
+  DEAD=1
 }
 
 convert_coords() {
+  FIRSTIN=${1:0:1}
+  SECONDIN=${1:1:2}
 
+  for k in $(seq 0 10); do
+    if [[ "$SECONDIN" == "${ALPH[k]}" ]]; then
+      YINDEX=$k
+    fi
+  done
+
+  FIRSTOUT=$((9 * YINDEX))
+  SECONDOUT=$((FIRSTOUT + SECONDIN))
+  GUESSLOC=$SECONDOUT
 }
 
 # Setup Board and variables
@@ -90,8 +112,10 @@ done
 
 while test $CLRSPC -lt 90 && test $DEAD -eq 0; do
   print_board
-  echo "    "$ERR 
+  echo "    "$ERR
+  echo ${BOMARR[@]}
   read GUESSLOC
+
   GUESSX=${GUESSLOC:0:1}
   GUESSY=${GUESSLOC:1:2}
   ERRORCKX=0
@@ -101,7 +125,7 @@ while test $CLRSPC -lt 90 && test $DEAD -eq 0; do
   if [[ $GUESSX =~ ^[+-]?[0-9]+$ ]]; then
     :
   else
-    ERR="!!X guess is not a number!!" 
+    ERR="!!X guess is not a number!!"
     ERRORCKX=1
   fi
 
@@ -112,7 +136,6 @@ while test $CLRSPC -lt 90 && test $DEAD -eq 0; do
     fi
   fi
 
-
   if [[ $GUESSY =~ ^[+-]?[0-9]+$ ]]; then
     ERR="!!Y guess is not a letter"
     ERRORCKY=1
@@ -120,43 +143,42 @@ while test $CLRSPC -lt 90 && test $DEAD -eq 0; do
     :
   fi
 
-  if test $ERRORCKY -eq 0; then	
+  if test $ERRORCKY -eq 0; then
     ERRORCKY=1
     for t in $(seq 0 10); do
-    	if [[ "$GUESSY" == "${ALPH[t]}" ]] ; then	
-		ERRORCKY=0
-    	fi
-    done 
+      if [[ "$GUESSY" == "${ALPH[t]}" ]]; then
+        ERRORCKY=0
+      fi
+    done
     if test $ERRORCKY -eq 1; then
-	ERR="!!Y guess is not in range!!"
+      ERR="!!Y guess is not in range!!"
     fi
   fi
 
-  for n in $(seq 0 $((CLRSPC-1))); do
-   if [[ "$GUESSLOC" == "${GUSTRK[n]}" ]] ; then	
+  for n in $(seq 0 $((CLRSPC - 1))); do
+    if [[ "$GUESSLOC" == "${GUSTRK[n]}" ]]; then
       ERRORCK=1
-      ERR="!!Space has already been cleared!!" 
-   fi
- done
+      ERR="!!Space has already been cleared!!"
+    fi
+  done
 
-
+  convert_coords $GUESSLOC
   if test $ERRORCKY -eq 1 || test $ERRORCKX -eq 1 || test $ERRORCK -eq 1; then
-	  echo "bad"
-	  #:
+    :
   else
 
-        for m in $(seq 0 $((TARGETBOM-1))); do
-		if [[ "$GUESSLOC" == "${BOMARR[m]}" ]]; then
-		   death_screen
-		else
-		   ERR="     Which space to clear? :"
-		   GUSTRK[$CLRSPC]=$GUESSLOC
-		   CLRSPC=$((CLRSPC+1))
-		fi
-	done
+    for m in $(seq 0 $((TARGETBOM - 1))); do
+      if [[ "$GUESSLOC" == "${BOMARR[m]}" ]]; then
+        death_screen
+      else
+        ERR="     Which space to clear? :"
+        GUSTRK[$CLRSPC]=$GUESSLOC
+        CLRSPC=$((CLRSPC + 1))
+      fi
+    done
   fi
 
-  clear
+  #clear
 done
 
 # TEST OUTPUT
