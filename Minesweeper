@@ -9,6 +9,7 @@ clear
 
 # CLI GUI Function
 print_board() {
+  echo ${BOMARR[*]}
   echo ""
   echo "    Spaces Cleared: "$CLRSPC"   Flags Placed: "${!FLGARR[@]}
   echo ""
@@ -19,7 +20,9 @@ print_board() {
     for x in $(seq 0 8); do
       CELLTYPE=()
       CELLNUM=$(((x + 1) + (y * 9)))
-
+      if test $CELLNUM -lt 10; then # If bomb location number is < 10
+        CELLNUM="0"$CELLNUM         # add 0 to front of single digit number
+      fi
       for n in $(seq 0 $((CLRSPC - 1))); do
         if [[ "$CELLNUM" == "${GUSTRK[n]}" ]]; then
           CELLTYPE="SAFE"
@@ -34,7 +37,18 @@ print_board() {
 
       case $CELLTYPE in
       SAFE)
-        ROWARR[x]="O"
+        NEARBOM=0
+
+        NEARARR=(01 02 03 04 05 06 07 08 09)
+        for p in $(seq 0 7); do
+          for o in $(seq 0 $((BOMNUM - 1))); do
+            if [[ "${NEARARR[p]}" == "${BOMARR[o]}" ]]; then
+              NEARBOM=$((NEARBOM + 1))
+            fi
+          done
+        done
+
+        ROWARR[x]=$NEARBOM
         ;;
       FLAG)
         ROWARR[x]="F"
@@ -85,6 +99,9 @@ convert_coords() {
   COLMADD=$((ROWADD + FIRSTIN))
   GUESSLOC=$((COLMADD))
   #echo $GUESSLOC
+  if test $GUESSLOC -lt 10; then # If bomb location number is < 10
+    GUESSLOC="0"$GUESSLOC        # add 0 to front of single digit number
+  fi
 }
 
 # Setup Board and variables
