@@ -11,7 +11,7 @@ clear
 print_board() {
   echo ${BOMARR[*]}
   echo ""
-  echo "    Spaces Cleared: "$CLRSPC"   Flags Placed: "${!FLGARR[@]}
+  echo "    Spaces Cleared: "$CLRSPC"   Flags Placed: "${#FLGARR[@]}
   echo ""
   echo "          1 2 3 4 5 6 7 8 9"
   echo "         %%%%%%%%%%%%%%%%%%%"
@@ -39,8 +39,39 @@ print_board() {
       SAFE)
         NEARBOM=0
 
-        NEARARR=(01 02 03 04 05 06 07 08 09)
-        for p in $(seq 0 7); do
+        if
+          [[ "$CELLNUM" == "01" ]] || [[ "$CELLNUM" == "02" ]] ||
+            [[ "$CELLNUM" == "10" ]] || [[ "$CELLNUM" == "11" ]] ||
+            [[ "$CELLNUM" == "19" ]] || [[ "$CELLNUM" == "20" ]] ||
+            [[ "$CELLNUM" == "28" ]] || [[ "$CELLNUM" == "29" ]] ||
+            [[ "$CELLNUM" == "37" ]] || [[ "$CELLNUM" == "38" ]] ||
+            [[ "$CELLNUM" == "46" ]] || [[ "$CELLNUM" == "47" ]] ||
+            [[ "$CELLNUM" == "55" ]] || [[ "$CELLNUM" == "56" ]] ||
+            [[ "$CELLNUM" == "64" ]] || [[ "$CELLNUM" == "65" ]] ||
+            [[ "$CELLNUM" == "73" ]] || [[ "$CELLNUM" == "74" ]] ||
+            [[ "$CELLNUM" == "82" ]] || [[ "$CELLNUM" == "83" ]] ||
+            [[ "$CELLNUM" == "91" ]] || [[ "$CELLNUM" == "92" ]]
+        then
+          NEARARR=($((CELLNUM - 9)) $((CELLNUM - 8)) $((CELLNUM + 1)) $((CELLNUM + 9)) $((CELLNUM + 10)))
+        elif
+          [[ "$CELLNUM" == "08" ]] || [[ "$CELLNUM" == "09" ]] ||
+            [[ "$CELLNUM" == "17" ]] || [[ "$CELLNUM" == "18" ]] ||
+            [[ "$CELLNUM" == "26" ]] || [[ "$CELLNUM" == "27" ]] ||
+            [[ "$CELLNUM" == "35" ]] || [[ "$CELLNUM" == "36" ]] ||
+            [[ "$CELLNUM" == "44" ]] || [[ "$CELLNUM" == "45" ]] ||
+            [[ "$CELLNUM" == "53" ]] || [[ "$CELLNUM" == "54" ]] ||
+            [[ "$CELLNUM" == "62" ]] || [[ "$CELLNUM" == "63" ]] ||
+            [[ "$CELLNUM" == "71" ]] || [[ "$CELLNUM" == "72" ]] ||
+            [[ "$CELLNUM" == "80" ]] || [[ "$CELLNUM" == "81" ]] ||
+            [[ "$CELLNUM" == "89" ]] || [[ "$CELLNUM" == "90" ]] ||
+            [[ "$CELLNUM" == "98" ]] || [[ "$CELLNUM" == "99" ]]
+        then
+          NEARARR=($((CELLNUM - 9)) $((CELLNUM - 8)) $((CELLNUM + 1)) $((CELLNUM + 9)) $((CELLNUM + 10)))
+        else
+          NEARARR=($((CELLNUM - 10)) $((CELLNUM - 9)) $((CELLNUM - 8)) $((CELLNUM - 1)) $((CELLNUM + 1)) $((CELLNUM + 8)) $((CELLNUM + 9)) $((CELLNUM + 10)))
+        fi
+
+        for p in $(seq 0 ${#NEARARR[@]}); do
           for o in $(seq 0 $((BOMNUM - 1))); do
             if [[ "${NEARARR[p]}" == "${BOMARR[o]}" ]]; then
               NEARBOM=$((NEARBOM + 1))
@@ -66,7 +97,7 @@ print_board() {
 
 death_screen() {
   clear
-  echo "           YOU FAILED :("
+  echo "           YOU FAILED :(        "
   echo ""
   echo "          %%%%%%%%%%%%%%%       "
   echo "       %%%%%%%%%%%%%%%%%%%%%    "
@@ -112,7 +143,7 @@ CLRSPC=0
 GUSTRK=()
 GUSNUM=0
 CELLTYPE="UNGES"
-FLAGARR=(00)
+FLGARR=()
 ALPH=("A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K")
 ERR="     What is your guess? :"
 DEAD=0
