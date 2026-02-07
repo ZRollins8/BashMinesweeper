@@ -17,6 +17,21 @@ print_board() {
   for y in $(seq 0 10); do
     ROWARR=()
     for x in $(seq 0 8); do
+      CELLTYPE=()
+      CELLNUM=$(((x + 1) + (y * 9)))
+
+      for n in $(seq 0 $((CLRSPC - 1))); do
+        if [[ "$CELLNUM" == "${GUSTRK[n]}" ]]; then
+          CELLTYPE="SAFE"
+        fi
+      done
+
+      for n in $(seq 0 $((CLRSPC - 1))); do
+        if [[ "$CELLNUM" == "${FLGARR[n]}" ]]; then
+          CELLTYPE="FLAG"
+        fi
+      done
+
       case $CELLTYPE in
       SAFE)
         ROWARR[x]="O"
@@ -24,7 +39,7 @@ print_board() {
       FLAG)
         ROWARR[x]="F"
         ;;
-      UNGES)
+      *)
         ROWARR[x]="X"
         ;;
       esac
@@ -36,6 +51,7 @@ print_board() {
 }
 
 death_screen() {
+  clear
   echo "           YOU FAILED :("
   echo ""
   echo "          %%%%%%%%%%%%%%%       "
@@ -45,8 +61,9 @@ death_screen() {
   echo "      %%%%   %%%%%%%%%  %%%%%   "
   echo "      %%%%%%%%%%% %%%%%%%%%%%   "
   echo "        %%%%%%%%   %%%%%%%%     "
-  echo "          %%%%%%%%%%%%%%%        "
-  echo "          %%%%%%%%%%%%%%%        "
+  echo "          %%%%%%%%%%%%%%%       "
+  echo "          %%%%%%%%%%%%%%%       "
+  echo "           %%% %% %% %%%        "
   echo "           %%% %% %% %%%        "
   echo "           %%% %% %% %%%        "
   echo ""
@@ -78,7 +95,7 @@ CLRSPC=0
 GUSTRK=()
 GUSNUM=0
 CELLTYPE="UNGES"
-FLAGARR=()
+FLAGARR=(00)
 ALPH=("A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K")
 ERR="     What is your guess? :"
 DEAD=0
@@ -87,8 +104,8 @@ DEAD=0
 while test $BOMNUM -lt $TARGETBOM; do
 
   #Run while less than target number of bombs
-  GOODCHECK=1                            # Reset Checker
-  BOMLOC=$((RANDOM % (100 - 1 + 1) + 1)) # Generate new random bomb position
+  GOODCHECK=1                           # Reset Checker
+  BOMLOC=$((RANDOM % (99 - 1 + 1) + 1)) # Generate new random bomb position
 
   # Test if single digit number for formatting
   if test $BOMLOC -lt 10; then # If bomb location number is < 10
@@ -101,8 +118,6 @@ while test $BOMNUM -lt $TARGETBOM; do
   ); do
     if test $BOMLOC -eq ${BOMARR[i]}; then # if the new bomb is loacted in repeat spot
       GOODCHECK=0                          # Trip checker variable
-    else                                   # if bomb location unique
-      :                                    # continue through loop
     fi
   done
 
@@ -115,6 +130,7 @@ while test $BOMNUM -lt $TARGETBOM; do
 done
 
 while test $CLRSPC -lt 90 && test $DEAD -eq 0; do
+  clear
   print_board
   echo "       "$ERR
   #echo ${BOMARR[@]}
@@ -176,14 +192,11 @@ while test $CLRSPC -lt 90 && test $DEAD -eq 0; do
         death_screen
       else
         ERR="     Which space to clear? :"
-
       fi
     done
     GUSTRK[$CLRSPC]=$GUESSLOC
     CLRSPC=$((CLRSPC + 1))
   fi
-
-  clear
 done
 
 # TEST OUTPUT
